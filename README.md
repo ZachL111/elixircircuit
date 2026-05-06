@@ -1,68 +1,40 @@
 # elixircircuit
 
-`elixircircuit` treats reliability as a local verification problem. The Elixir implementation is intentionally narrow, but the fixtures and notes make the behavior explicit.
+`elixircircuit` keeps a focused Elixir implementation around reliability. The project goal is to model circuit breakers with half-open probes and recovery behavior.
 
-## Elixircircuit Checkpoints
+## Why This Exists
 
-Treat the compact fixture as the contract and the extended examples as a scratchpad. The code should stay boring enough that a change in behavior is obvious from the test output.
+This is intentionally local and self-contained so it can be inspected without credentials, services, or seeded history.
 
-## Useful Pieces
+## Elixircircuit Review Notes
 
-- Includes extended examples for runbook checks, including `recovery` and `degraded`.
-- Documents recovery paths tradeoffs in `docs/operations.md`.
-- Runs locally with a single verification command and no external credentials.
-- Stores project constants and verification metadata in `metadata/project.json`.
-- Adds a repository audit script that checks structure before running the language verifier.
+Start with `recovery gap` and `budget pressure`. Those cases create the widest score spread in this repo, so they are the best quick check when the model changes.
 
-## What This Is For
+## Capabilities
 
-The goal is to capture the core behavior in code and make the surrounding assumptions obvious. A reader should be able to run the verifier, open the fixtures, and understand why each decision was made.
+- `fixtures/domain_review.csv` adds cases for budget pressure and failure width.
+- `metadata/domain-review.json` records the same cases in structured form.
+- `config/review-profile.json` captures the read order and the two review questions.
+- `examples/elixircircuit-walkthrough.md` walks through the case spread.
+- The Elixir code includes a review path for `recovery gap` and `budget pressure`.
+- `docs/field-notes.md` explains the strongest and weakest cases.
 
-## Project Layout
+## Implementation Shape
 
-- `lib`: library code
-- `test`: language test directory
-- `fixtures`: compact golden scenarios
-- `examples`: expanded scenario set
-- `metadata`: project constants and verification metadata
-- `docs`: operations and extension notes
-- `scripts`: local verification and audit commands
+The fixture data drives the tests. The code stays thin, while `metadata/domain-review.json` and `config/review-profile.json` explain what each case is meant to protect.
 
-## Architecture Notes
+The Elixir addition stays small enough to inspect in one sitting.
 
-The design is intentionally direct: parse or construct a signal, score it, classify it, and verify the expected branch. This makes the repository useful for studying reliability behavior without needing a service or database unless the language project itself is SQL. The Elixir project uses Mix and ExUnit with clear data maps for each scenario.
-
-## Local Workflow
+## Local Usage
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1
 ```
 
-This runs the language-level build or test path against the compact fixture set.
+## Verification
 
-## Case Study
+The verifier is intentionally local. It should fail if the fixture score math, lane assignment, or language-specific test drifts.
 
-`examples/extended_cases.csv` adds six named cases. I kept the names plain so failures are easy to read in a terminal: baseline, pressure, surge, degraded, recovery, and boundary.
+## Roadmap
 
-## Quality Gate
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/audit.ps1
-```
-
-The audit command checks repository structure and README constraints before it delegates to the verifier.
-
-## Scope
-
-The examples cover useful edges, not every edge. A larger version would add malformed-input tests, richer reports, and deeper domain parsers.
-
-## Expansion Ideas
-
-- Add malformed input fixtures so the failure path is as visible as the happy path.
-- Split the scoring constants into a typed configuration object and validate it before use.
-- Add a comparison mode that shows how decisions change when one signal is adjusted.
-- Add one more reliability fixture that focuses on a malformed or borderline input.
-
-## Tooling
-
-The only required setup is the local Elixir toolchain. After cloning, stay in the repo root so fixture paths resolve correctly.
+The fixture set is small enough to audit by hand. The next useful expansion is malformed input coverage, not extra surface area.
