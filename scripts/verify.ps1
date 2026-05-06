@@ -61,3 +61,9 @@ foreach ($pathPattern in $knownPaths) {
 mix test
 
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-elixircircuit-detail.ps1
+
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-elixircircuit-properties.ps1
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-elixircircuit-golden.ps1
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
